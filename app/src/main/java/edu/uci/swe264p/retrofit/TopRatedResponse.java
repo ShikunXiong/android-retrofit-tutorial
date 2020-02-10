@@ -1,9 +1,6 @@
 package edu.uci.swe264p.retrofit;
 
 import android.util.Log;
-import android.widget.TextView;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,6 +14,11 @@ public class TopRatedResponse {
     final static String API_KEY = "035917615d522300f90bc9cef1cc3ecc";
 
     private MovieList movieList = null;
+
+    private OnTopRatedMovieUpdateCallback callback;
+    public void setCallback(OnTopRatedMovieUpdateCallback callback) {
+        this.callback = callback;
+    }
 
     public MovieList getMovieList() {
         Log.e("xxx", "2yes");
@@ -37,15 +39,21 @@ public class TopRatedResponse {
             @Override
             public void onResponse(Call<MovieList> call, Response<MovieList> response) {
                 assert response.body() != null;
-
                 movieList = new MovieList(response.body().getMovies());
                 Log.e("xxx", "1yes");
 
+                if (callback != null) {
+                    callback.onMovieUpdate(movieList);
+                }
             }
             @Override
             public void onFailure(Call<MovieList> call, Throwable throwable) {
                 Log.e("xxx", "fail");
             }
         });
+    }
+
+    public interface OnTopRatedMovieUpdateCallback {
+        void onMovieUpdate(MovieList movieList);
     }
 }
